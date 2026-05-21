@@ -1,5 +1,4 @@
 # Fraud-Thumbnail-detection
-# Fraud Detection Model Improvements - 90%+ Accuracy Target
 
 ## Overview
 This document outlines the comprehensive improvements made to the fraud detection system in `phase2.py` to achieve **90%+ accuracy, recall, and F1-score** using the `youtube1.csv` dataset.
@@ -113,7 +112,7 @@ python test_model.py
 ```
 
 ### 4. Web Interface
-- Access at `http://localhost:5001`
+- Access at `http://localhost:5002`
 - Login: `test@example.com` / `test123`
 - Navigate to Fraud Detection section
 
