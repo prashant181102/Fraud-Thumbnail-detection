@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FraudGuard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .logo-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.analyses {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .stat-icon.fraud {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .stat-icon.accuracy {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .stat-icon.users {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .feature-icon.detection {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .feature-icon.evaluation {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .feature-icon.analytics {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .feature-icon.admin {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .feature-description {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .feature-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .feature-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .activity-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1f2937;
+            text-align: center;
+        }
+
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .activity-icon.analysis {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .activity-icon.fraud {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .activity-probability {
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .activity-probability.high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .activity-probability.medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .activity-probability.low {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .user-menu {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">FraudGuard</div>
+            </div>
+            <div class="user-menu">
+                <div class="user-info">
+                    <div class="user-name" id="userName">Welcome Back!</div>
+                    <div class="user-email" id="userEmail">user@example.com</div>
+                </div>
+                <button class="admin-btn" id="adminBtn" onclick="goToAdmin()" style="display: none;">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">Welcome to FraudGuard Dashboard</h1>
+            <p class="welcome-subtitle">Advanced YouTube thumbnail fraud detection at your fingertips</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon analyses">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="stat-value" id="totalAnalyses">0</div>
+                <div class="stat-label">Total Analyses</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon fraud">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-value" id="fraudDetected">0</div>
+                <div class="stat-label">Fraud Detected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon accuracy">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-value" id="accuracyRate">95.2%</div>
+                <div class="stat-label">Accuracy Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" id="totalUsers">1</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon detection">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-title">Fraud Detection</h3>
+                <p class="feature-description">
+                    Analyze YouTube video thumbnails for potential fraud using our advanced AI algorithms. 
+                    Detect image manipulation, compression artifacts, and suspicious patterns.
+                </p>
+                <a href="/fraud-detection" class="feature-btn">
+                    <i class="fas fa-play"></i> Start Analysis
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-title">Video Search</h3>
+                <p class="feature-description">
+                    Search YouTube videos by topic and find the least fraudulent content. 
+                    Our AI ranks videos by fraud probability to help you discover trustworthy content.
+                </p>
+                <a href="/video-search" class="feature-btn">
+                    <i class="fas fa-search"></i> Search Videos
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon evaluation">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Model Evaluation</h3>
+                <p class="feature-description">
+                    View detailed model performance metrics, confusion matrices, and comprehensive 
+                    visualizations to understand our fraud detection accuracy.
+                </p>
+                <a href="/model-evaluation" class="feature-btn">
+                    <i class="fas fa-chart-bar"></i> View Metrics
+                </a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon analytics">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3 class="feature-title">Analytics Dashboard</h3>
+                <p class="feature-description">
+                    Track your analysis history, view detailed statistics, and monitor 
+                    fraud detection patterns with comprehensive analytics.
+                </p>
+                <button class="feature-btn" onclick="showAnalytics()">
+                    <i class="fas fa-chart-area"></i> View Analytics
+                </button>
+            </div>
+
+            <div class="feature-card" id="adminPanelCard" style="display: none;">
+                <div class="feature-icon admin">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="feature-title">Admin Panel</h3>
+                <p class="feature-description">
+                    Access administrative functions, manage users, view system analytics, 
+                    and control application settings.
+                </p>
+                <a href="/admin" class="feature-btn">
+                    <i class="fas fa-cog"></i> Admin Panel
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity">
+            <h2 class="activity-title">Recent Activity</h2>
+            <ul class="activity-list" id="activityList">
+                <li class="activity-item">
+                    <div class="activity-icon analysis">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">No recent activity</div>
+                        <div class="activity-time">Start by analyzing a video</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            loadDashboardData();
+        });
+
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                if (!data.logged_in) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                // Update user info
+                document.getElementById('userEmail').textContent = data.email;
+                document.getElementById('userName').textContent = `Welcome, ${data.email.split('@')[0]}!`;
+                
+                // Check if user is admin
+                checkAdminStatus();
+                
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/admin/users');
+                if (response.ok) {
+                    // User has admin access, show admin panel and button
+                    document.getElementById('adminPanelCard').style.display = 'block';
+                    document.getElementById('adminBtn').style.display = 'inline-block';
+                }
+            } catch (error) {
+                // User is not admin, admin panel remains hidden
+                console.log('User is not an admin');
+            }
+        }
+
+        function goToAdmin() {
+            window.location.href = '/admin';
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Load analytics data
+                const response = await fetch('/analytics');
+                const data = await response.json();
+                
+                // Update stats
+                document.getElementById('totalAnalyses').textContent = data.total_analyses || 0;
+                document.getElementById('fraudDetected').textContent = data.fraud_detected || 0;
+                document.getElementById('totalUsers').textContent = data.total_users || 1;
+                
+                // Update recent activity
+                updateRecentActivity(data.recent_analyses || []);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        function updateRecentActivity(analyses) {
+            const activityList = document.getElementById('activityList');
+            
+            if (analyses.length === 0) {
+                activityList.innerHTML = `
+                    <li class="activity-item">
+                        <div class="activity-icon analysis">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">No recent activity</div>
+                            <div class="activity-time">Start by analyzing a video</div>
+                        </div>
+                    </li>
+                `;
+                return;
+            }
+            
+            activityList.innerHTML = analyses.slice(-5).reverse().map(analysis => {
+                const probability = analysis.fraud_probability || 0;
+                let probabilityClass = 'low';
+                let probabilityText = 'Low Risk';
+                
+                if (probability > 0.7) {
+                    probabilityClass = 'high';
+                    probabilityText = 'High Risk';
+                } else if (probability > 0.4) {
+                    probabilityClass = 'medium';
+                    probabilityText = 'Medium Risk';
+                }
+                
+                const time = new Date(analysis.timestamp).toLocaleString();
+                const videoTitle = analysis.video_url ? analysis.video_url.split('/').pop() : 'Unknown Video';
+                
+                return `
+                    <li class="activity-item">
+                        <div class="activity-icon ${probability > 0.5 ? 'fraud' : 'analysis'}">
+                            <i class="fas fa-${probability > 0.5 ? 'exclamation-triangle' : 'search'}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">Analyzed: ${videoTitle}</div>
+                            <div class="activity-time">${time}</div>
+                        </div>
+                        <div class="activity-probability ${probabilityClass}">${probabilityText}</div>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/';
+            }
+        }
+
+        function showAnalytics() {
+            // This could open a modal or redirect to a dedicated analytics page
+            alert('Analytics dashboard will be implemented here. For now, you can view model evaluation metrics.');
+            window.location.href = '/model-evaluation';
+        }
+
+        // Add some interactive effects
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.05)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html> 

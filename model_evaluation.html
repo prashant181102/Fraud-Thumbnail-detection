@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Evaluation - FraudGuard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            padding: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .logo-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .user-email {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Authentication Required Message */
+        .auth-required {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 40px auto;
+            max-width: 600px;
+        }
+
+        .auth-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.3);
+        }
+
+        .auth-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        .auth-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .auth-subtitle {
+            font-size: 1.2rem;
+            color: #6b7280;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .auth-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-btn.secondary {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .auth-btn.secondary:hover {
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .page-title i {
+            color: #667eea;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Control Section */
+        .control-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .control-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .evaluate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evaluate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .evaluate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .evaluate-btn.loading {
+            pointer-events: none;
+        }
+
+        .evaluate-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .results-subtitle {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .metric-icon.accuracy {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .metric-icon.precision {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .metric-icon.recall {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .metric-icon.f1 {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        .metric-label {
+            font-size: 1rem;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Visualization Section */
+        .visualization-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .visualization-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1f2937;
+            text-align: center;
+        }
+
+        .visualization-container {
+            text-align: center;
+        }
+
+        .visualization-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Classification Report */
+        .report-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .report-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .report-content {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #374151;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border-left: 4px solid #10b981;
+        }
+
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .loading-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .loading-state p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .main-content {
+                padding: 25px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-required {
+                margin: 20px;
+                padding: 40px 20px;
+            }
+
+            .auth-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">FraudGuard</div>
+            </div>
+            <div class="nav-menu">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="/fraud-detection" class="nav-link">
+                    <i class="fas fa-search"></i> Fraud Detection
+                </a>
+                <a href="/model-evaluation" class="nav-link active">
+                    <i class="fas fa-chart-line"></i> Model Evaluation
+                </a>
+            </div>
+            <div class="user-menu" id="userMenu" style="display: none;">
+                <div class="user-info">
+                    <div class="user-name" id="userName">Welcome Back!</div>
+                    <div class="user-email" id="userEmail">user@example.com</div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Authentication Required Message -->
+        <div class="auth-required" id="authRequired">
+            <div class="auth-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h1 class="auth-title">Authentication Required</h1>
+            <p class="auth-subtitle">
+                You need to be logged in to access the model evaluation features. 
+                Please sign in to your account to continue.
+            </p>
+            <div>
+                <a href="/login" class="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </a>
+                <a href="/" class="auth-btn secondary">
+                    <i class="fas fa-home"></i> Go Home
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content (Hidden until authenticated) -->
+        <div id="mainContent" style="display: none;">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-chart-line"></i>
+                    Model Evaluation
+                </h1>
+                <p class="page-subtitle">
+                    Evaluate the performance of our fraud detection model using your YouTube dataset. 
+                    Get detailed metrics, visualizations, and insights into model accuracy.
+                </p>
+            </div>
+
+            <!-- Messages -->
+            <div class="message error" id="errorMessage"></div>
+            <div class="message success" id="successMessage"></div>
+            <div class="message info" id="infoMessage"></div>
+
+            <!-- Control Section -->
+            <div class="control-section">
+                <h2 class="control-title">Start Model Evaluation</h2>
+                <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.6;">
+                    Click the button below to evaluate the model using your YouTube CSV dataset. 
+                    This will analyze multiple videos and provide comprehensive performance metrics.
+                </p>
+                <button class="evaluate-btn" id="evaluateBtn" onclick="evaluateModel()">
+                    <span>Evaluate Model</span>
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState" style="display: none;">
+                <i class="fas fa-cog"></i>
+                <h3>Evaluating Model...</h3>
+                <p>This may take a few minutes as we analyze multiple videos from your dataset.</p>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <!-- Results Header -->
+                <div class="results-header">
+                    <h2 class="results-title">Evaluation Results</h2>
+                    <p class="results-subtitle">Comprehensive analysis of model performance</p>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="metrics-grid" id="metricsGrid">
+                    <div class="metric-card">
+                        <div class="metric-icon accuracy">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="metric-value" id="accuracyValue">0.00</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon precision">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div class="metric-value" id="precisionValue">0.00</div>
+                        <div class="metric-label">Precision</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon recall">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="metric-value" id="recallValue">0.00</div>
+                        <div class="metric-label">Recall</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-icon f1">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="metric-value" id="f1Value">0.00</div>
+                        <div class="metric-label">F1-Score</div>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="summary-section">
+                    <h3 class="summary-title">Evaluation Summary</h3>
+                    <div class="summary-grid" id="summaryGrid">
+                        <div class="summary-item">
+                            <div class="summary-value" id="totalSamples">0</div>
+                            <div class="summary-label">Total Videos</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" id="actualFraud">0</div>
+                            <div class="summary-label">Actual Fraud</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" id="predictedFraud">0</div>
+                            <div class="summary-label">Predicted Fraud</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" id="correctPredictions">0</div>
+                            <div class="summary-label">Correct Predictions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization Section -->
+                <div class="visualization-section">
+                    <h3 class="visualization-title">Performance Visualization</h3>
+                    <div class="visualization-container">
+                        <img id="visualizationImage" class="visualization-image" src="" alt="Model performance visualization" style="display: none;">
+                    </div>
+                </div>
+
+                <!-- Classification Report -->
+                <div class="report-section">
+                    <h3 class="report-title">Detailed Classification Report</h3>
+                    <div class="report-content" id="classificationReport">
+                        No evaluation data available. Run the model evaluation to see detailed results.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
+
+        async function checkAuthStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                if (data.logged_in) {
+                    // User is authenticated - show main content
+                    document.getElementById('authRequired').style.display = 'none';
+                    document.getElementById('mainContent').style.display = 'block';
+                    document.getElementById('userMenu').style.display = 'flex';
+                    
+                    // Update user info
+                    document.getElementById('userEmail').textContent = data.email;
+                    document.getElementById('userName').textContent = `Welcome, ${data.email.split('@')[0]}!`;
+                } else {
+                    // User is not authenticated - show auth required message
+                    document.getElementById('authRequired').style.display = 'block';
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.getElementById('userMenu').style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+                // Show auth required message on error
+                document.getElementById('authRequired').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('userMenu').style.display = 'none';
+            }
+        }
+
+        async function evaluateModel() {
+            const evaluateBtn = document.getElementById('evaluateBtn');
+            const loadingState = document.getElementById('loadingState');
+            const resultsSection = document.getElementById('resultsSection');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            const infoMessage = document.getElementById('infoMessage');
+
+            // Show loading state
+            evaluateBtn.classList.add('loading');
+            evaluateBtn.querySelector('span').textContent = 'Evaluating...';
+            loadingState.style.display = 'block';
+            resultsSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            infoMessage.style.display = 'none';
+
+            try {
+                const response = await fetch('/evaluate-model', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        evaluation_type: 'standard'  // Default to standard evaluation
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    displayResults(data);
+                    successMessage.textContent = 'Model evaluation completed successfully!';
+                    successMessage.style.display = 'block';
+                } else {
+                    errorMessage.textContent = data.error || 'Evaluation failed. Please try again.';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Network error. Please check your connection.';
+                errorMessage.style.display = 'block';
+            } finally {
+                // Reset button state
+                evaluateBtn.classList.remove('loading');
+                evaluateBtn.querySelector('span').textContent = 'Evaluate Model';
+                loadingState.style.display = 'none';
+            }
+        }
+
+        function displayResults(data) {
+            const metrics = data.metrics;
+            
+            // Update metrics
+            document.getElementById('accuracyValue').textContent = (metrics.accuracy * 100).toFixed(1) + '%';
+            document.getElementById('precisionValue').textContent = (metrics.precision * 100).toFixed(1) + '%';
+            document.getElementById('recallValue').textContent = (metrics.recall * 100).toFixed(1) + '%';
+            document.getElementById('f1Value').textContent = (metrics.f1_score * 100).toFixed(1) + '%';
+
+            // Update summary
+            document.getElementById('totalSamples').textContent = metrics.total_samples;
+            document.getElementById('actualFraud').textContent = metrics.actual_fraud;
+            document.getElementById('predictedFraud').textContent = metrics.fraud_detected;
+            document.getElementById('correctPredictions').textContent = 
+                Math.round(metrics.accuracy * metrics.total_samples);
+
+            // Update visualization
+            if (data.visualization) {
+                const img = document.getElementById('visualizationImage');
+                img.src = 'data:image/png;base64,' + data.visualization;
+                img.style.display = 'block';
+            }
+
+            // Update classification report
+            document.getElementById('classificationReport').textContent = metrics.classification_report;
+
+            // Show results
+            document.getElementById('resultsSection').style.display = 'block';
+
+            // Add some animation effects
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Add some interactive effects
+        document.querySelectorAll('.metric-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html> 
